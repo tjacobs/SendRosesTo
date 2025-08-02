@@ -37,6 +37,8 @@ def create_video(audio_path: str, image_path: str, output_path: str) -> None:
         # Load the audio file
         print("Loading audio file...")
         audio = AudioFileClip(audio_path)
+        print(f"Audio duration: {audio.duration} seconds")
+        print(f"Audio fps: {audio.fps}")
         
         # Load the image file
         print("Loading image file...")
@@ -50,9 +52,12 @@ def create_video(audio_path: str, image_path: str, output_path: str) -> None:
         
         # Write the video file
         print(f"Creating video file at {output_path}...")
-        video.write_videofile(output_path, fps=24, codec='libx264')
-        
-        print("Video creation completed successfully!")
+        print(f"Video duration: {video.duration} seconds")
+        print(f"Video has audio: {video.audio is not None}")
+        if video.audio:
+            print(f"Video audio duration: {video.audio.duration} seconds")
+        video.write_videofile(output_path, fps=24, codec='libx264', audio_codec='aac')
+        print("Video creation completed successfully.")
         
     except Exception as e:
         print(f"An error occurred: {str(e)}")
@@ -65,7 +70,7 @@ def create_video(audio_path: str, image_path: str, output_path: str) -> None:
 
 def main():
     audio_file = 'audio.mp3'
-    image_file = 'image.jpg'  # You'll need to provide an image file
+    image_file = 'image.jpg'
     output_file = 'video.mp4'
     
     if validate_files(audio_file, image_file):
