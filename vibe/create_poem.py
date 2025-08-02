@@ -8,7 +8,7 @@ OPENAI_API_KEY = 'sk-proj-PRBKC1gQnyoQ4JZIs31pMfgyLFvIUKA26TcZY4-ifvDGiVuZENQ9xV
 if not OPENAI_API_KEY: raise ValueError("Please set the OPENAI_API_KEY environment variable")
 openai.api_key = OPENAI_API_KEY
 
-def generate_poem(prompt: str) -> Optional[str]:
+def create_poem(prompt: str) -> Optional[str]:
     """
     Generate a poem using OpenAI's API based on a prompt about someone.
     
@@ -42,16 +42,17 @@ def generate_poem(prompt: str) -> Optional[str]:
         # Extract the poem from the response
         poem = response.choices[0].message.content.strip()
         return poem
-        
+
     except Exception as e:
         print(f"Error generating poem: {str(e)}")
         return None
+
 
 def main():
     # Example prompt - you can modify this
     prompt = "her name is sarah, she's famous."
 
-    poem = generate_poem(prompt)
+    poem = create_poem(prompt)
     if poem:
         print(poem)
         
