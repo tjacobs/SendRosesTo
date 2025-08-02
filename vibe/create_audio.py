@@ -11,17 +11,28 @@ KEY = 'NmowRmNFUkQwQ2VWWDI4SmlGTzg4blQ4NFJVSWY3dmg6d1kycjdmRnJUUlppN1F5d1MyaXhsY
 url = "https://api.inworld.ai/tts/v1/voice"
 headers = { "Authorization": f"Basic {KEY}", "Content-Type": "application/json" }
 
-# Generate the audio
-payload = {
-    "text": TEXT,
-    "voiceId": "Hades",
-    "modelId": "inworld-tts-1"
-}
-response = requests.post(url, json=payload, headers=headers)
-response.raise_for_status()
-result = response.json()
-audio_content = base64.b64decode(result['audioContent'])
+def create_audio(text: str, output_file: str = "audio.mp3") -> str:
+    """Convert *text* to speech (MP3) via Inworld TTS and return the saved path."""
+    payload = {
+        "text": text,
+        "voiceId": "Hades",
+        "modelId": "inworld-tts-1",
+    }
+    response = requests.post(url, json=payload, headers=headers)
+    response.raise_for_status()
+    result = response.json()
+    audio_content = base64.b64decode(result["audioContent"])
 
-# Save the audio to a file
-with open("audio.mp3", "wb") as f:
-    f.write(audio_content)
+    with open(output_file, "wb") as f:
+        f.write(audio_content)
+
+    return os.path.abspath(output_file)
+
+
+# ---------------------------------------------------------------------------
+# CLI / debug usage
+# ---------------------------------------------------------------------------
+if __name__ == "__main__":
+    # If run directly, generate audio from the default TEXT constant
+    output_path = create_audio(TEXT)
+    print(f"Audio saved to {output_path}")
