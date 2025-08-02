@@ -1,0 +1,79 @@
+
+# Gotta install old version because new version of moviepy does NOT have editor!!!
+# pip uninstall moviepy -y
+# pip install moviepy==1.0.3
+
+import argparse
+import os
+from moviepy.editor import AudioFileClip, ImageClip
+
+def validate_files(audio_path: str, image_path: str) -> bool:
+    """
+    Validate that the input files exist and are the correct format.
+    """
+    if not os.path.exists(audio_path):
+        print(f"Error: Audio file '{audio_path}' does not exist")
+        return False
+    
+    if not os.path.exists(image_path):
+        print(f"Error: Image file '{image_path}' does not exist")
+        return False
+    
+    # Check file extensions
+    if not audio_path.lower().endswith('.mp3'):
+        print("Error: Audio file must be an MP3")
+        return False
+    
+    if not image_path.lower().endswith(('.jpg', '.jpeg', '.png')):
+        print("Error: Image file must be JPG or PNG")
+        return False
+    
+    return True
+
+def create_video(audio_path: str, image_path: str, output_path: str) -> None:
+    """
+    Create a video from a static image and an audio file.
+    """
+    try:
+        # Load the audio file
+        print("Loading audio file...")
+        audio = AudioFileClip(audio_path)
+        
+        # Load the image file
+        print("Loading image file...")
+        image = ImageClip(image_path)
+        
+        # Set the duration of the image to match the audio
+        video = image.set_duration(audio.duration)
+        
+        # Set the audio
+        video = video.set_audio(audio)
+        
+        # Write the video file
+        print(f"Creating video file at {output_path}...")
+        video.write_videofile(output_path, fps=24, codec='libx264')
+        
+        print("Video creation completed successfully!")
+        
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+    finally:
+        # Clean up
+        if 'audio' in locals():
+            audio.close()
+        if 'video' in locals():
+            video.close()
+
+def main():
+    parser = argparse.ArgumentParser(description='Create a video from an MP3 and a static image')
+    parser.add_argument('audio', help='Path to the input MP3 file')
+    parser.add_argument('image', help='Path to the input image file (JPG or PNG)')
+    parser.add_argument('output', help='Path for the output MP4 file')
+    
+    args = parser.parse_args()
+    
+    if validate_files(args.audio, args.image):
+        create_video(args.audio, args.image, args.output)
+
+if __name__ == '__main__':
+    main()
