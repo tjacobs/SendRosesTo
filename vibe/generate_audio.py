@@ -23,5 +23,5 @@ result = response.json()
 audio_content = base64.b64decode(result['audioContent'])
 
 # Save the audio to a file
-with open("output.mp3", "wb") as f:
+with open("audio.mp3", "wb") as f:
     f.write(audio_content)
