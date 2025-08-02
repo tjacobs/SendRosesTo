@@ -3,7 +3,6 @@
 # pip uninstall moviepy -y
 # pip install moviepy==1.0.3
 
-import argparse
 import os
 from moviepy.editor import AudioFileClip, ImageClip
 
@@ -65,15 +64,12 @@ def create_video(audio_path: str, image_path: str, output_path: str) -> None:
             video.close()
 
 def main():
-    parser = argparse.ArgumentParser(description='Create a video from an MP3 and a static image')
-    parser.add_argument('audio', help='Path to the input MP3 file')
-    parser.add_argument('image', help='Path to the input image file (JPG or PNG)')
-    parser.add_argument('output', help='Path for the output MP4 file')
+    audio_file = 'audio.mp3'
+    image_file = 'image.jpg'  # You'll need to provide an image file
+    output_file = 'video.mp4'
     
-    args = parser.parse_args()
-    
-    if validate_files(args.audio, args.image):
-        create_video(args.audio, args.image, args.output)
+    if validate_files(audio_file, image_file):
+        create_video(audio_file, image_file, output_file)
 
 if __name__ == '__main__':
     main()
