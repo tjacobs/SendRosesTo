@@ -1,6 +1,10 @@
 import requests
 import base64
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Text to generate audio for
 TEXT = "(I'm a scary voice!)"

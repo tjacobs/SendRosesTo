@@ -4,6 +4,7 @@ import tweepy
 from dotenv import load_dotenv
 import sys
 import logging
+import argparse
 sys.path.append('vibe')
 from create_poem import create_poem
 from create_audio import create_audio
@@ -137,6 +138,31 @@ def get_author_tag(author_id):
         print(f"Error getting author tag: {e}")
         return None
 
+def read_specific_tweet(tweet_url):
+    """Read a specific tweet by URL"""
+    try:
+        # Extract tweet ID from URL
+        tweet_id = tweet_url.split('/')[-1].split('?')[0]
+        
+        client = get_twitter_client()
+        
+        # Get the specific tweet
+        tweet = client.get_tweet(
+            id=tweet_id,
+            tweet_fields=['created_at', 'author_id', 'public_metrics'],
+            user_auth=True
+        )
+        
+        if tweet.data:
+            return tweet.data.text, tweet.data.author_id
+        else:
+            print("Tweet not found.")
+            return None, None
+            
+    except Exception as e:
+        print(f"Error reading specific tweet: {e}")
+        return None, None
+
 def compose_tweet(author_tag, target_tag, poem):
     """Compose a complete tweet with header, poem, and footer"""
     # Create header
@@ -159,38 +185,53 @@ def compose_tweet(author_tag, target_tag, poem):
     return tweet_text
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Process tweets and send flower responses')
+    parser.add_argument('--tweet-url', help='Process a specific tweet by URL')
+    args = parser.parse_args()
+
     video_path = "video.mp4"
     audio_path = "audio.mp3"
     image_path = "image.jpg"
 
-    tweet_text, author_id = read(1)
+    # Read tweet based on mode
+    if args.tweet_url:
+        print(f"Processing specific tweet: {args.tweet_url}")
+        tweet_text, author_id = read_specific_tweet(args.tweet_url)
+    else:
+        print("Reading latest mentions...")
+        tweet_text, author_id = read(1)
+    
     print(f"Tweet Text: {tweet_text}")
     print(f"Author ID: {author_id}")
 
-    author_tag = get_author_tag(author_id)
-    print(f"Author Tag: {author_tag}")
-    
-    target_tag = extract_target_tag(tweet_text)
-    print(f"Target Tag: {target_tag}")
-
-    print("\nTesting compose_tweet function:")
-    if target_tag and author_tag:
-        # Generate poem based on target_tag
-        prompt = f"make a love poem about how great {target_tag} is"
-        poem = create_poem(prompt)
-        print(f"Poem:\n{poem}")
-
-        composed_tweet = compose_tweet(author_tag, target_tag, poem)
-        print(f"Complete tweet:\n{composed_tweet}")
+    if tweet_text and author_id:
+        author_tag = get_author_tag(author_id)
+        print(f"Author Tag: {author_tag}")
         
-        # Create audio and video    
-        audio_path = create_audio(poem, audio_path)
-        video_path = create_video(audio_path, image_path, video_path)
+        target_tag = extract_target_tag(tweet_text)
+        print(f"Target Tag: {target_tag}")
 
-        video_path = "/Users/thomasjacobs/Documents/GitHub/VibeOrNot/video.mp4"
-        print(f"Audio path: {audio_path}")
-        print(f"Video path: {video_path}")
+        print("\nTesting compose_tweet function:")
+        if target_tag and author_tag:
+            # Generate poem based on target_tag
+            prompt = f"make a love poem about how great {target_tag} is"
+            poem = create_poem(prompt)
+            print(f"Poem:\n{poem}")
 
-        # Post tweet with video
-        write(composed_tweet, video_path)
+            composed_tweet = compose_tweet(author_tag, target_tag, poem)
+            print(f"Complete tweet:\n{composed_tweet}")
+            
+            # Create audio and video    
+            audio_path = create_audio(poem, audio_path)
+            video_path = create_video(audio_path, image_path, video_path)
+
+            import os
+            video_path = os.path.join(os.path.dirname(__file__), "video.mp4")
+            print(f"Audio path: {audio_path}")
+            print(f"Video path: {video_path}")
+
+            # Post tweet with video
+            write(composed_tweet, video_path)
+    else:
+        print("No valid tweet found to process.")
 
