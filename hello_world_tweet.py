@@ -26,45 +26,57 @@ def get_twitter_api():
     return tweepy.API(auth)
 
 def write(text, video_path=None):
-    """Post a tweet with optional video attachment using v1.1 API"""
+    """Post a tweet with optional video attachment using v2 API"""
     try:
-        api = get_twitter_api()
+        client = get_twitter_client()
         media_ids = None
         
         if video_path and os.path.exists(video_path):
             print(f"Uploading video: {video_path}")
+            api = get_twitter_api()
             media = api.media_upload(video_path)
             media_ids = [media.media_id]
             print(f"Video uploaded! Media ID: {media.media_id}")
         
-        response = api.update_status(status=text, media_ids=media_ids)
+        response = client.create_tweet(text=text, media_ids=media_ids, user_auth=True)
         
-        print(f"Tweet posted successfully! Tweet ID: {response.id}")
-        print(f"Tweet URL: https://twitter.com/user/status/{response.id}")
-        return response
+        print(f"Tweet posted successfully! Tweet ID: {response.data['id']}")
+        print(f"Tweet URL: https://twitter.com/user/status/{response.data['id']}")
+        return response.data
         
     except Exception as e:
         print(f"Error posting tweet: {e}")
         return None
 
 def read(count=10):
-    """Read tweets where the user is mentioned/tagged using v1.1 API"""
+    """Read tweets where the user is mentioned/tagged using v2 API"""
     try:
-        api = get_twitter_api()
+        client = get_twitter_client()
         
-        # Get mentions using v1.1 API
-        mentions = api.mentions_timeline(count=count, tweet_mode='extended')
+        # Get the authenticated user's ID
+        me = client.get_me(user_auth=True)
+        user_id = me.data.id
         
-        if mentions:
-            print(f"Found {len(mentions)} mentions:")
-            for i, tweet in enumerate(mentions, 1):
+        # Get mentions using v2 API (max_results must be 5-100)
+        max_results = max(5, min(100, count))
+        mentions = client.get_users_mentions(
+            id=user_id,
+            max_results=max_results,
+            tweet_fields=['created_at', 'author_id', 'public_metrics'],
+            user_auth=True
+        )
+        
+        if mentions.data:
+            print(f"Found {len(mentions.data)} mentions:")
+            for i, tweet in enumerate(mentions.data, 1):
                 print(f"\n{i}. Tweet ID: {tweet.id}")
-                print(f"   Text: {tweet.full_text}")
+                print(f"   Text: {tweet.text}")
                 print(f"   Created: {tweet.created_at}")
-                print(f"   Author: @{tweet.user.screen_name}")
-                print(f"   Likes: {tweet.favorite_count}, Retweets: {tweet.retweet_count}")
+                print(f"   Author ID: {tweet.author_id}")
+                if tweet.public_metrics:
+                    print(f"   Likes: {tweet.public_metrics['like_count']}, Retweets: {tweet.public_metrics['retweet_count']}")
             
-            return mentions
+            return mentions.data
         else:
             print("No mentions found.")
             return []
@@ -76,7 +88,7 @@ def read(count=10):
 if __name__ == "__main__":
     # Example usage
     print("Testing write function:")
-    #write("Testing the new write function! 🚀", "/ai_commerce/amazon_ai_agent/video.mp4")
+    write("Testing v2 API migration! 🔥", "/ai_commerce/amazon_ai_agent/video.mp4")
     
     print("\nTesting read function:")
     read(1)
