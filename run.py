@@ -48,6 +48,8 @@ def write(text, video_path=None):
             media_ids = [media.media_id]
             print(f"Video uploaded! Media ID: {media.media_id}")
         
+        # Debug: log the tweet text being sent
+        print("[write] Tweet text to be posted:\n" + text)
         try:
             response = client.create_tweet(text=text, media_ids=media_ids, user_auth=True)
         except tweepy.errors.Forbidden as err:
@@ -98,17 +100,24 @@ def read(count=1):
         return None
 
 def extract_target_tag(tweet_text):
-    """Extract @ tags from tweet text, excluding @sendroses2"""
-    mention_pattern = r'@(\w+)'
-    mentions = re.findall(mention_pattern, tweet_text) #"Hello @sendroses2, sending roses to @test") #tweet_text "")
-    
-    target_tags = [mention for mention in mentions if mention.lower() != 'sendrosesto']
-    
+    """Extract @ tags from tweet text, excluding @sendroses2. Returns first external mention."""
+    mention_pattern = r'@(?P<tag>\w+)'
+    mentions = re.findall(mention_pattern, tweet_text)
+
+    # Debug logging
+    print("[extract_target_tag] Raw tweet text:", tweet_text)
+    print("[extract_target_tag] Mentions found:", mentions)
+
+    target_tags = [m for m in mentions if m.lower() != 'sendrosesto']
+    print("[extract_target_tag] Filtered target_tags (excluding sendrosesto):", target_tags)
+
     if target_tags:
-        return target_tags[0]
+        chosen = target_tags[0]
+        print(f"[extract_target_tag] Returning first target tag: @{chosen}")
+        return chosen
     else:
-        print("No target tags found (excluding @sendroses2)")
-        return []
+        print("[extract_target_tag] No target tags found (excluding @sendroses2)")
+        return None
 
 def get_author_tag(author_id):
     """Get the username/tag from author ID"""
@@ -167,7 +176,7 @@ if __name__ == "__main__":
     print("\nTesting compose_tweet function:")
     if target_tag and author_tag:
         # Generate poem based on target_tag
-        prompt = f"A beautiful girl named {target_tag} who loves food and living life and sleeping"
+        prompt = f"make a love poem about how great {target_tag} is"
         poem = create_poem(prompt)
         print(f"Poem:\n{poem}")
 
