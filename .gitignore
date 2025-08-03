@@ -3,3 +3,7 @@ vibe/audio.mp3
 vibe/video.mp4
 vibe/poem.txt
 /vibe/__pycache__
+.env
+__pycache__/
+.claude/
+node_modules/
