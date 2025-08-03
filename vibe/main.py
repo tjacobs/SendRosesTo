@@ -15,7 +15,6 @@ from create_poem  import create_poem
 from create_audio import create_audio
 from create_video import create_video
 
-PROMPT = "My friend Sarah who has a head that is a bit too big for her body"
 POEM_FILE  = Path("poem.txt")
 AUDIO_FILE = Path("audio.mp3")
 IMAGE_FILE = Path("image.jpg")
