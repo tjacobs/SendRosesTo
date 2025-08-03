@@ -4,7 +4,6 @@ from typing import Optional
 
 # Get API key
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
-OPENAI_API_KEY = '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'
 if not OPENAI_API_KEY: raise ValueError("Please set the OPENAI_API_KEY environment variable")
 openai.api_key = OPENAI_API_KEY
 
