@@ -89,7 +89,7 @@ def extract_target_tag(tweet_text):
     mention_pattern = r'@(\w+)'
     mentions = re.findall(mention_pattern, tweet_text) #"Hello @sendroses2, sending roses to @test") #tweet_text "")
     
-    target_tags = [mention for mention in mentions if mention.lower() != 'sendroses2']
+    target_tags = [mention for mention in mentions if mention.lower() != 'sendrosesto']
     
     if target_tags:
         return target_tags[0]
@@ -128,7 +128,12 @@ def compose_tweet(author_tag, target_tag):
         poem = "Roses are red, violets are blue,\nThese flowers are sent with love to you."
     
     # Create footer
-    footer = "Do you accept?"
+    footer = "Do you accept? Yes or no.\n\n" \
+             \
+             "Powered by @inworld_ai, @tenstorrent, @windsurf, @agihouse_org.\n" \
+             "Built by @RyanHolmes100, @TomPJacobs, @kaarelkaarelson.\n\n" \
+             \
+             "(To send your own roses, send a tweet to @sendrosesto and at the person you want to send roses to.)"
     
     # Combine all parts
     tweet_text = f"{header}\n\n{poem}\n\n{footer}"
