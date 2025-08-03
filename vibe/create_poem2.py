@@ -17,8 +17,6 @@ import requests
 # Endpoint
 _URL = "https://api.inworld.ai/llm/v1alpha/completions:completeText"
 
-# Inworld API key
-KEY = 'NmowRmNFUkQwQ2VWWDI4SmlGTzg4blQ4NFJVSWY3dmg6d1kycjdmRnJUUlppN1F5d1MyaXhsYVE2NTRFZlUxWklsTHpkZzgxQ3VrdGpCOWx4ZmNLRUg5bzNmSWNSaXR1Rg=='
 
 _HEADERS = {
     "Authorization": f"Basic {KEY}",
