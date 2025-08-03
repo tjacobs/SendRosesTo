@@ -137,12 +137,12 @@ def compose_tweet(author_tag, target_tag, poem):
         poem = "Roses are red, violets are blue,\nThese flowers are sent with love to you."
     
     # Create footer
-    footer = "Do you accept? Yes or no.\n\n" \
-             \
-             "Powered by @inworld_ai, @tenstorrent, @windsurf, @agihouse_org.\n" \
-             "Built by @RyanHolmes100, @TomPJacobs, @kaarelkaarelson.\n\n" \
-             \
-             "(To send your own roses, send a tweet to @sendrosesto and at the person you want to send roses to.)"
+    footer = "Do you accept? Yes or no.\n\n" #   ; \
+#             \
+#             "Powered by @inworld_ai, @tenstorrent, @windsurf, @agihouse_org.\n" \
+#             "Built by @RyanHolmes100, @TomPJacobs, @kaarelkaarelson.\n\n" \
+#             \
+#             "(To send your own roses, send a tweet to @sendrosesto and at the person you want to send roses to.)"
     
     # Combine all parts
     tweet_text = f"{header}\n\n{poem}\n\n{footer}"
