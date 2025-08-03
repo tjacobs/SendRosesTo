@@ -11,10 +11,8 @@ from create_video import create_video
 
 load_dotenv()
 
-# Enable debug logging for tweepy and urllib3 to diagnose 403 errors
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(asctime)s | %(name)s | %(levelname)s | %(message)s")
-logging.getLogger("urllib3").setLevel(logging.DEBUG)
+# Disable verbose logging (set to WARNING)
+logging.basicConfig(level=logging.WARNING)
 
 def get_twitter_client():
     """Initialize and return Twitter API client"""
