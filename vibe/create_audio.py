@@ -15,7 +15,7 @@ def create_audio(text: str, output_file: str = "audio.mp3") -> str:
     """Convert *text* to speech (MP3) via Inworld TTS and return the saved path."""
     payload = {
         "text": text,
-        "voiceId": "Hades",
+        "voiceId": "Deborah",
         "modelId": "inworld-tts-1",
     }
     response = requests.post(url, json=payload, headers=headers)
