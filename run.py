@@ -180,7 +180,7 @@ if __name__ == "__main__":
         audio_path = create_audio(poem, audio_path)
         video_path = create_video(audio_path, image_path, video_path)
 
-        #video_path = "/Users/thomasjacobs/Documents/GitHub/VibeOrNot/video.mp4"
+        video_path = "/Users/thomasjacobs/Documents/GitHub/VibeOrNot/video.mp4"
         print(f"Audio path: {audio_path}")
         print(f"Video path: {video_path}")
 
