@@ -2,6 +2,11 @@ import os
 import re
 import tweepy
 from dotenv import load_dotenv
+import sys
+sys.path.append('vibe')
+from create_poem import create_poem
+from create_audio import create_audio
+from create_video import create_video
 
 load_dotenv()
 
@@ -49,7 +54,7 @@ def write(text, video_path=None):
         print(f"Error posting tweet: {e}")
         return None
 
-def read(count=10):
+def read(count=1):
     """Read tweets where the user is mentioned/tagged using v2 API"""
     try:
         client = get_twitter_client()
@@ -68,19 +73,12 @@ def read(count=10):
         )
         
         if mentions.data:
-            print(f"Found {len(mentions.data)} mentions:")
-            for i, tweet in enumerate(mentions.data, 1):
-                print(f"\n{i}. Tweet ID: {tweet.id}")
-                print(f"   Text: {tweet.text}")
-                print(f"   Created: {tweet.created_at}")
-                print(f"   Author ID: {tweet.author_id}")
-                if tweet.public_metrics:
-                    print(f"   Likes: {tweet.public_metrics['like_count']}, Retweets: {tweet.public_metrics['retweet_count']}")
             
-            return mentions.data
+            author_tag = get_author_tag(mentions.data[0].author_id)
+            return mentions.data[0].text, author_tag
         else:
             print("No mentions found.")
-            return []
+            return [], None
             
     except Exception as e:
         print(f"Error reading mentions: {e}")
@@ -117,32 +115,48 @@ def get_author_tag(author_id):
         print(f"Error getting author tag: {e}")
         return None
 
+def compose_tweet(author_tag, target_tag):
+    """Compose a complete tweet with header, poem, and footer"""
+    # Create header
+    header = f"@{author_tag} is sending flowers to @{target_tag}"
+    
+    # Generate poem based on target_tag
+    prompt = f"a person with the username {target_tag}, send them beautiful flowers"
+    poem = create_poem(prompt)
+    
+    if not poem:
+        poem = "Roses are red, violets are blue,\nThese flowers are sent with love to you."
+    
+    # Create footer
+    footer = "Do you accept?"
+    
+    # Combine all parts
+    tweet_text = f"{header}\n\n{poem}\n\n{footer}"
+    
+    return tweet_text
+
 if __name__ == "__main__":
-    # Read text from poem.txt
-    poem_path = "poem.txt"
     video_path = "video.mp4"
-    
-    try:
-        with open(poem_path, 'r', encoding='utf-8') as f:
-            poem_text = f.read().strip()
-        
-        print("Testing write function:")
-        print(f"Poem text: {poem_text}")
-        #write(poem_text, video_path)
-        
-    except FileNotFoundError:
-        print(f"Error: {poem_path} not found. Please run the vibe/main.py first to generate the poem.")
-        print("Falling back to default text...")
-        #write("Testing the new write function! 🚀", video_path)
-    
-    print("\nTesting read function:")
-    #read(1)
+    audio_path = "audio.mp3"
+    image_path = "image.jpg"
 
-    print("\nTesting extract_target_tag function:")
-    target_tag = extract_target_tag("Hello @sendroses2, sending roses to @test")
-    #print(f"Target Tag: {target_tag}")
-
-    print("\nTesting get_author_tag function:")
-    author_tag = get_author_tag("44196397")
+    tweet_text, author_tag = read(1)
+    print(f"Tweet Text: {tweet_text}")
     print(f"Author Tag: {author_tag}")
+    
+    print("\nTesting extract_target_tag function:")
+    target_tag = extract_target_tag(tweet_text)
+    print(f"Target Tag: {target_tag}")
+
+    print("\nTesting compose_tweet function:")
+    if target_tag and author_tag:
+        composed_tweet = compose_tweet(author_tag, target_tag)
+        print(f"Complete tweet:\n{composed_tweet}")
+        
+        # Create audio and video    
+        audio_path = create_audio(composed_tweet, audio_path)
+        video_path = create_video(audio_path, image_path, video_path)
+        
+        # Post tweet with video
+        write(composed_tweet, video_path)
 
