@@ -152,7 +152,7 @@ if __name__ == "__main__":
     print("\nTesting compose_tweet function:")
     if target_tag and author_tag:
         # Generate poem based on target_tag
-        prompt = f"A beautiful girl named {target_tag} who has a head that is a bit too big for her body"
+        prompt = f"A beautiful girl named {target_tag}"
         poem = create_poem(prompt)
         print(f"Poem:\n{poem}")
         
@@ -162,7 +162,11 @@ if __name__ == "__main__":
         # Create audio and video    
         audio_path = create_audio(poem, audio_path)
         video_path = create_video(audio_path, image_path, video_path)
-        
+
+        video_path = "/Users/thomasjacobs/Documents/GitHub/VibeOrNot/video.mp4"
+        print(f"Audio path: {audio_path}")
+        print(f"Video path: {video_path}")
+
         # Post tweet with video
         write(composed_tweet, video_path)
 
