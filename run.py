@@ -3,12 +3,18 @@ import re
 import tweepy
 from dotenv import load_dotenv
 import sys
+import logging
 sys.path.append('vibe')
 from create_poem import create_poem
 from create_audio import create_audio
 from create_video import create_video
 
 load_dotenv()
+
+# Enable debug logging for tweepy and urllib3 to diagnose 403 errors
+logging.basicConfig(level=logging.DEBUG,
+                    format="%(asctime)s | %(name)s | %(levelname)s | %(message)s")
+logging.getLogger("urllib3").setLevel(logging.DEBUG)
 
 def get_twitter_client():
     """Initialize and return Twitter API client"""
@@ -44,8 +50,19 @@ def write(text, video_path=None):
             media_ids = [media.media_id]
             print(f"Video uploaded! Media ID: {media.media_id}")
         
-        response = client.create_tweet(text=text, media_ids=media_ids, user_auth=True)
-        
+        try:
+            response = client.create_tweet(text=text, media_ids=media_ids, user_auth=True)
+        except tweepy.errors.Forbidden as err:
+            print("=== Tweepy Forbidden (403) ===")
+            resp = err.response
+            print(f"Status code: {resp.status_code}")
+            print("Headers:\n", resp.headers)
+            try:
+                print("Body:\n", resp.json())
+            except ValueError:
+                print("Body (raw):\n", resp.text)
+            raise  # re-raise so the outer handler can also catch it
+
         print(f"Tweet posted successfully! Tweet ID: {response.data['id']}")
         print(f"Tweet URL: https://twitter.com/user/status/{response.data['id']}")
         return response.data
@@ -152,10 +169,10 @@ if __name__ == "__main__":
     print("\nTesting compose_tweet function:")
     if target_tag and author_tag:
         # Generate poem based on target_tag
-        prompt = f"A beautiful girl named {target_tag}"
+        prompt = f"A beautiful girl named {target_tag} who loves food and living life and sleeping"
         poem = create_poem(prompt)
         print(f"Poem:\n{poem}")
-        
+
         composed_tweet = compose_tweet(author_tag, target_tag, poem)
         print(f"Complete tweet:\n{composed_tweet}")
         
@@ -163,7 +180,7 @@ if __name__ == "__main__":
         audio_path = create_audio(poem, audio_path)
         video_path = create_video(audio_path, image_path, video_path)
 
-        video_path = "/Users/thomasjacobs/Documents/GitHub/VibeOrNot/video.mp4"
+        #video_path = "/Users/thomasjacobs/Documents/GitHub/VibeOrNot/video.mp4"
         print(f"Audio path: {audio_path}")
         print(f"Video path: {video_path}")
 
