@@ -1,4 +1,5 @@
 import os
+import re
 import tweepy
 from dotenv import load_dotenv
 
@@ -85,10 +86,41 @@ def read(count=10):
         print(f"Error reading mentions: {e}")
         return None
 
+def extract_target_tag(tweet_text):
+    """Extract @ tags from tweet text, excluding @sendroses2"""
+    mention_pattern = r'@(\w+)'
+    mentions = re.findall(mention_pattern, tweet_text) #"Hello @sendroses2, sending roses to @test") #tweet_text "")
+    
+    target_tags = [mention for mention in mentions if mention.lower() != 'sendroses2']
+    
+    if target_tags:
+        return target_tags[0]
+    else:
+        print("No target tags found (excluding @sendroses2)")
+        return []
+
 if __name__ == "__main__":
-    # Example usage
-    print("Testing write function:")
-    write("Testing v2 API migration! 🔥", "/ai_commerce/amazon_ai_agent/video.mp4")
+    # Read text from poem.txt
+    poem_path = "poem.txt"
+    video_path = "video.mp4"
+    
+    try:
+        with open(poem_path, 'r', encoding='utf-8') as f:
+            poem_text = f.read().strip()
+        
+        print("Testing write function:")
+        print(f"Poem text: {poem_text}")
+        #write(poem_text, video_path)
+        
+    except FileNotFoundError:
+        print(f"Error: {poem_path} not found. Please run the vibe/main.py first to generate the poem.")
+        print("Falling back to default text...")
+        #write("Testing the new write function! 🚀", video_path)
     
     print("\nTesting read function:")
-    read(1)
+    #read(1)
+
+    print("\nTesting extract_target_tag function:")
+    target_tag = extract_target_tag("Hello @sendroses2, sending roses to @test")
+    print(f"Target Tag: {target_tag}")
+
