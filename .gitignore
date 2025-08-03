@@ -7,3 +7,5 @@ vibe/poem.txt
 __pycache__/
 .claude/
 node_modules/
+video.mp4
+audio.mp3
