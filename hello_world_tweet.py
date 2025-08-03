@@ -99,6 +99,24 @@ def extract_target_tag(tweet_text):
         print("No target tags found (excluding @sendroses2)")
         return []
 
+def get_author_tag(author_id):
+    """Get the username/tag from author ID"""
+    try:
+        client = get_twitter_client()
+        user = client.get_user(id=author_id, user_auth=True)
+        
+        if user.data:
+            username = user.data.username
+            print(f"Author tag: @{username}")
+            return username
+        else:
+            print("User not found")
+            return None
+            
+    except Exception as e:
+        print(f"Error getting author tag: {e}")
+        return None
+
 if __name__ == "__main__":
     # Read text from poem.txt
     poem_path = "poem.txt"
@@ -122,5 +140,9 @@ if __name__ == "__main__":
 
     print("\nTesting extract_target_tag function:")
     target_tag = extract_target_tag("Hello @sendroses2, sending roses to @test")
-    print(f"Target Tag: {target_tag}")
+    #print(f"Target Tag: {target_tag}")
+
+    print("\nTesting get_author_tag function:")
+    author_tag = get_author_tag("44196397")
+    print(f"Author Tag: {author_tag}")
 
