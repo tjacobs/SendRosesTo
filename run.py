@@ -73,9 +73,7 @@ def read(count=1):
         )
         
         if mentions.data:
-            
-            author_tag = get_author_tag(mentions.data[0].author_id)
-            return mentions.data[0].text, author_tag
+            return mentions.data[0].text, mentions.data[0].author_id
         else:
             print("No mentions found.")
             return [], None
@@ -115,14 +113,10 @@ def get_author_tag(author_id):
         print(f"Error getting author tag: {e}")
         return None
 
-def compose_tweet(author_tag, target_tag):
+def compose_tweet(author_tag, target_tag, poem):
     """Compose a complete tweet with header, poem, and footer"""
     # Create header
     header = f"@{author_tag} is sending flowers to @{target_tag}"
-    
-    # Generate poem based on target_tag
-    prompt = f"a person with the username {target_tag}, send them beautiful flowers"
-    poem = create_poem(prompt)
     
     if not poem:
         poem = "Roses are red, violets are blue,\nThese flowers are sent with love to you."
@@ -145,21 +139,28 @@ if __name__ == "__main__":
     audio_path = "audio.mp3"
     image_path = "image.jpg"
 
-    tweet_text, author_tag = read(1)
+    tweet_text, author_id = read(1)
     print(f"Tweet Text: {tweet_text}")
+    print(f"Author ID: {author_id}")
+
+    author_tag = get_author_tag(author_id)
     print(f"Author Tag: {author_tag}")
     
-    print("\nTesting extract_target_tag function:")
     target_tag = extract_target_tag(tweet_text)
     print(f"Target Tag: {target_tag}")
 
     print("\nTesting compose_tweet function:")
     if target_tag and author_tag:
-        composed_tweet = compose_tweet(author_tag, target_tag)
+        # Generate poem based on target_tag
+        prompt = f"A beautiful girl named {target_tag} who has a head that is a bit too big for her body"
+        poem = create_poem(prompt)
+        print(f"Poem:\n{poem}")
+        
+        composed_tweet = compose_tweet(author_tag, target_tag, poem)
         print(f"Complete tweet:\n{composed_tweet}")
         
         # Create audio and video    
-        audio_path = create_audio(composed_tweet, audio_path)
+        audio_path = create_audio(poem, audio_path)
         video_path = create_video(audio_path, image_path, video_path)
         
         # Post tweet with video
